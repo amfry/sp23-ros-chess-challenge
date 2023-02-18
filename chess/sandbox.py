@@ -1,35 +1,90 @@
 import serial
 import time
 import sys
+from serial_comms import SerialComms
 
+
+# import os
+# os.system("picocom --echo /tmp/stockfish")
 
 port = "/tmp/stockfish"
-baud = 9600
-
-ser = serial.Serial()
-ser.port = port
-ser.baudrate = baud
-ser.bytesize = serial.EIGHTBITS
-ser.parity = serial.PARITY_NONE
-ser.xonxoff = 0
-ser.rtscts = 0
-ser.dsrdtr = 0
-ser.stopbits = 1
-ser.timeout = 1
-
-ser.close()
-ser.open()
-if ser.isOpen():
-    print(ser.name + ' is open...')
-    while True:
-        cmd = "uci"
-        ser.write(str.encode(cmd + '\r\n')) #
-        val = ser.readline().decode()
-        out1 = val.strip()
-        out2 = val
-        print('Receiving... ' + str(out1))
-        print('Receiving... ' + str(out2))
-        break
-ser.close()
+with SerialComms(port) as conn:
+    conn.ser.reset_input_buffer()
+    conn.ser.reset_output_buffer()
+    time.sleep(0.1)
+    print(conn.port_name)
+    conn.write("uci")
+    result_str = conn.read_decode() 
+    print(result_str)
+    if "uciok" in result_str:
+        print("Found!")
+    else:
+        print("Not found!")
+    # print("new read 1")
+    # conn.ser.reset_input_buffer()
+    # conn.ser.reset_output_buffer()
+    # conn.write("ucinewgame")
+    # print("new read 2")
+    # conn.ser.reset_input_buffer()
+    # conn.ser.reset_output_buffer()
+    # conn.write("isready")
+    # print(conn.read_decode())
 
 
+
+# ser = serial.Serial()
+# ser.port = port
+# ser.baudrate = baud
+# ser.bytesize = serial.EIGHTBITS
+# ser.parity = serial.PARITY_NONE
+# ser.xonxoff = 0
+# ser.rtscts = 0
+# ser.dsrdtr = 0
+# ser.stopbits = 1
+# ser.timeout = 0.3
+
+# ser.close()
+# ser.open()
+# if ser.isOpen():
+#     print(ser.name + ' is open...')
+#     ser.flushOutput()
+#     ser.flushInput()
+#     while True:
+#         cmd = "uci"
+#         ser.write(str.encode(cmd + '\r')) #carriage return
+#         #val1 = ser.read_until(str.encode("uciok\r"),64).decode()
+#         val1 = ser.read(256).decode()
+#         time.sleep(1)
+#         print(ser.inWaiting())
+#         out1 = val1.strip()
+#         print('Receiving... ')
+#         print(out1)
+#         print(val1)
+#         break
+# ser.close()
+
+    # def read(self,chunk_size=200):
+    #     #self.ser.reset_output_buffer()
+    #     read_buffer = b''
+    #     round = 0
+    #     empty_reads = 0
+    #     while True:
+    #         round = round + 1
+    #         print("round" + str(round))
+    #         # Read in chunks. Each chunk will wait as long as specified by
+    #         # timeout. Increase chunk_size to fail quicker
+    #         print("out_buffer: " + str(self.ser.out_waiting))
+    #         print("in_buffer: " + str(self.ser.in_waiting))
+    #         byte_chunk = self.ser.read(size=chunk_size)
+    #         read_buffer += byte_chunk
+    #         size = len(byte_chunk)
+    #         print(size)
+    #         if size == 0:
+    #             empty_reads = empty_reads + 1
+    #             print("empty:" + str(empty_reads))
+    #             if empty_reads >= 3:
+    #                 break
+    #                 # if not size >= chunk_size:
+    #                 #     break
+    #     read_buffer_str = read_buffer.decode()
+    #     return read_buffer_str
