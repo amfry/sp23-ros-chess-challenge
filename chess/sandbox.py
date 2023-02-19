@@ -3,10 +3,6 @@ import time
 import sys
 from serial_comms import SerialComms
 
-
-# import os
-# os.system("picocom --echo /tmp/stockfish")
-
 port = "/tmp/stockfish"
 with SerialComms(port) as conn:
     conn.ser.reset_input_buffer()
@@ -20,15 +16,6 @@ with SerialComms(port) as conn:
         print("Found!")
     else:
         print("Not found!")
-    # print("new read 1")
-    # conn.ser.reset_input_buffer()
-    # conn.ser.reset_output_buffer()
-    # conn.write("ucinewgame")
-    # print("new read 2")
-    # conn.ser.reset_input_buffer()
-    # conn.ser.reset_output_buffer()
-    # conn.write("isready")
-    # print(conn.read_decode())
 
 
 

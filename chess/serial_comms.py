@@ -34,9 +34,12 @@ class SerialComms():
         self.ser.stopbits = self.stopbits
         self.ser.timeout = self.timeout
         self.ser.open()
+        time.sleep(0.1)
+        self.ser.flush()
         return
 
     def close_port(self):
+        self.ser.flush()
         self.ser.close()
         return
 
@@ -58,6 +61,8 @@ class SerialComms():
 
             Returns:
                     results (str): """
+        # self.ser.reset_input_buffer()
+        # self.ser.reset_output_buffer()
         chunk_size = 200
         read_buffer = b''
         while self.ser.isOpen() == True:
