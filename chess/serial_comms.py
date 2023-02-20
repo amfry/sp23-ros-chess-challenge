@@ -6,7 +6,7 @@ import serial
 class SerialComms():
     """ Serial wrapper"""
 
-    def __init__(self,port_name, baudrate=9600, timeout=5, bytesize=8, parity_bit=serial.PARITY_NONE, stopbits=1):
+    def __init__(self,port_name, baudrate=9600, timeout=1, bytesize=8, parity_bit=serial.PARITY_NONE, stopbits=1):
         self.port_name = port_name
         self.baudrate = baudrate
         self.timeout = timeout
@@ -34,8 +34,8 @@ class SerialComms():
         self.ser.stopbits = self.stopbits
         self.ser.timeout = self.timeout
         self.ser.open()
-        time.sleep(0.1)
-        self.ser.flush()
+        self.ser.reset_output_buffer()
+        self.ser.reset_input_buffer()
         return
 
     def close_port(self):
@@ -52,7 +52,7 @@ class SerialComms():
         self.ser.write(str.encode(cmd + '\r')) #carriage return
         return
 
-    def read_decode(self, chunk_size=200):
+    def read(self, chunk_size=200):
         """Returns string of data read from the output buffer
 
             Parameters:
@@ -61,18 +61,22 @@ class SerialComms():
 
             Returns:
                     results (str): """
-        # self.ser.reset_input_buffer()
-        # self.ser.reset_output_buffer()
+        self.ser.reset_output_buffer()
         chunk_size = 200
         read_buffer = b''
+        empty_counter = 0
         while self.ser.isOpen() == True:
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
             size = len(byte_chunk)
             print(size)
             if not size == chunk_size:
-                break
+                empty_counter +=1
+                #print(size, empty_counter)
+                if empty_counter >= 2:
+                    break
         results = read_buffer.decode().strip()
+        #print(results)
         return results
         
         

@@ -10,9 +10,17 @@ with SerialComms(port) as conn:
     time.sleep(0.1)
     print(conn.port_name)
     conn.write("uci")
-    result_str = conn.read_decode() 
+    result_str = conn.read() 
     print(result_str)
     if "uciok" in result_str:
+        print("Found!")
+    else:
+        print("Not found!")
+    conn.write("ucinewgame")
+    conn.write("isready")
+    result_str = conn.read() 
+    print(result_str)
+    if "readyok" in result_str:
         print("Found!")
     else:
         print("Not found!")
