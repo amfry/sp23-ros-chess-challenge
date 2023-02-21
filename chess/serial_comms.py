@@ -68,7 +68,7 @@ class SerialComms():
         while self.ser.isOpen() == True:
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
-            size = len(byte_chunk)
+            #size = len(byte_chunk)
             print(size)
             if not size == chunk_size:
                 empty_counter +=1
