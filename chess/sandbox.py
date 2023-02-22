@@ -11,19 +11,27 @@ with SerialComms(port) as conn:
     print(conn.port_name)
     conn.write("uci")
     result_str = conn.read() 
+    time.sleep(1)
     print(result_str)
     if "uciok" in result_str:
         print("Found!")
     else:
         print("Not found!")
     conn.write("ucinewgame")
+    time.sleep(1)
     conn.write("isready")
+    time.sleep(1)
     result_str = conn.read() 
+    time.sleep(1)
     print(result_str)
     if "readyok" in result_str:
         print("Found!")
     else:
         print("Not found!")
+    conn.write("go movetime " + str(time))
+    time.sleep(1)
+    read_data = conn.read()
+    print(read_data)
 
 
 

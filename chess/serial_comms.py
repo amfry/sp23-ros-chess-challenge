@@ -52,7 +52,7 @@ class SerialComms():
         self.ser.write(str.encode(cmd + '\r')) #carriage return
         return
 
-    def read(self, chunk_size=200):
+    def read(self, chunk_size=100):
         """Returns string of data read from the output buffer
 
             Parameters:
@@ -68,15 +68,15 @@ class SerialComms():
         while self.ser.isOpen() == True:
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
-            #size = len(byte_chunk)
-            print(size)
+            size = len(byte_chunk)
+            # print(size)
             if not size == chunk_size:
-                empty_counter +=1
-                #print(size, empty_counter)
-                if empty_counter >= 2:
-                    break
+                break
+                # empty_counter +=1
+                # #print(size, empty_counter)
+                # if empty_counter >= 2:
+                #     break
         results = read_buffer.decode().strip()
-        #print(results)
         return results
         
         
