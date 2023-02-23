@@ -20,13 +20,13 @@ class ChessPlayer():
         self.players_turn = False
 
     def check_player_type(self):
-        print(self.player)
         if self.player == '/white':
             return 0
         else:
             return 1 # for blacks
 
     def close_game(self):
+        print("Exiting...")
         self.conn.close_port()
 
     def intialize_game(self):
@@ -38,6 +38,7 @@ class ChessPlayer():
         if uci_flag and new_game_flag and ready_flag:
             self.game_init = True
             print("Game Intialized!")
+        return self.game_init
       
 
     def send_uci(self):
@@ -73,15 +74,16 @@ class ChessPlayer():
         return
     
     def make_move(self, time=1000):
-        # self.conn.write("go movetime " + str(time))
-        # read_data = self.conn.read()
-        # print(read_data)
-        # if len(read_data) == 0:
-        #     print("trying again")
-        #     read_data = self.conn.read() #try again if no data collected
-        # move_read = re_string_search(self.uci_move_regex,read_data)
-        move_read ='d2d4' #hardcoding first move for dev!
+        self.conn.write("go movetime " + str(time))
+        read_data = self.conn.read()
+        print(read_data)
+        if len(read_data) == 0:
+            print("trying again")
+            read_data = self.conn.read() #try again if no data collected
+        move_read = re_string_search(self.uci_move_regex,read_data)
+        #move_read ='d2d4' #hardcoding first move for dev!
         move_msg = make_move_msg(move_read, self.player_type)
+        print(move_read)
         return move_msg
     
     def first_turn(self):
@@ -90,34 +92,63 @@ class ChessPlayer():
         else:
             self.players_turn = False
 
+def print_calls(val):
+    print(val)
 
 def main():
-    rospy.sleep(1)
-    rospy.init_node('chess_player')
-    r = rospy.Rate(10) # 10hz
+    rospy.init_node("chess_player")
     player = rospy.get_name()
     device = rospy.get_param(player+'/device')
-    chess_player = ChessPlayer(player, device) #
-    chess_player.intialize_game()
-    print(chess_player.game_init)
-    rospy.sleep(1)
+
     move_topic = player+'/move'
     move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
-    capture_topic = player+'/capture'
-    capture_pub = rospy.Publisher(capture_topic, Chesspiece, queue_size=3) #publisher for captures
-    board_topic = '/chessboard'
-    board_pub = rospy.Publisher(board_topic, Chessboard, queue_size=1) #publisher for updated board
     done_topic = player+'/done'
     done_pub = rospy.Publisher(done_topic, Empty, queue_size=3) #publisher to notify end of turn
-    chess_player.game_init = True
+
+    print(player, device)
+    chess_player = ChessPlayer(player, device)
+    rospy.sleep(1)
+    print(chess_player.intialize_game())
     if chess_player.game_init:
+        # if chess_player.player_type:
+        #     #if white
         while not rospy.is_shutdown():
+            rospy.sleep(5)
             move_to_pub= chess_player.make_move()
-            move_pub.publish(move_to_pub)
             print(move_to_pub)
-            done_pub.publish(Empty)
+            print(move_to_pub.piece.player.id)
+            move_pub.publish(move_to_pub)
+            #done_pub.publish(Empty)
+            rospy.sleep(1)
             rospy.sleep(15)
             break
+    # rospy.sleep(5)
+    # rospy.init_node('chess_player')
+    # #r = rospy.Rate(10) # 10hz
+    # player = rospy.get_name()
+    # device = rospy.get_param(player+'/device')
+    # chess_player = ChessPlayer(player, device) #
+    # rospy.sleep(5)
+    # chess_player.intialize_game()
+    # rospy.sleep(5)
+    # print(player + str(chess_player.game_init))
+    # rospy.sleep(1)
+    # move_topic = player+'/move'
+    # move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
+    # capture_topic = player+'/capture'
+    # capture_pub = rospy.Publisher(capture_topic, Chesspiece, queue_size=3) #publisher for captures
+    # board_topic = '/chessboard'
+    # board_pub = rospy.Publisher(board_topic, Chessboard, queue_size=1) #publisher for updated board
+    # done_topic = player+'/done'
+    # done_pub = rospy.Publisher(done_topic, Empty, queue_size=3) #publisher to notify end of turn
+    # #chess_player.game_init = True
+    # if chess_player.game_init:
+    #     while not rospy.is_shutdown():
+    #         move_to_pub= chess_player.make_move()
+    #         move_pub.publish(move_to_pub)
+    #         done_pub.publish(Empty)
+    #         rospy.sleep(15)
+    #         break
     chess_player.close_game()
 
 if __name__ == '__main__':

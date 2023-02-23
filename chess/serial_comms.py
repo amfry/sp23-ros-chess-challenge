@@ -49,6 +49,8 @@ class SerialComms():
                     cmd(str): message to be sent to serial device
         """
         # self.ser.flushOutput()
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
         self.ser.write(str.encode(cmd + '\r')) #carriage return
         return
 
@@ -61,14 +63,15 @@ class SerialComms():
 
             Returns:
                     results (str): """
-        self.ser.reset_output_buffer()
-        chunk_size = 200
+        time.sleep(.1)
+        chunk_size = 100
         read_buffer = b''
         empty_counter = 0
         while self.ser.isOpen() == True:
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
             size = len(byte_chunk)
+            print(size)
             # print(size)
             if not size == chunk_size:
                 break
@@ -77,6 +80,7 @@ class SerialComms():
                 # if empty_counter >= 2:
                 #     break
         results = read_buffer.decode().strip()
+        #print(results)
         return results
         
         
