@@ -18,12 +18,21 @@ class ChessPlayer():
         self.uci_move_regex = r'bestmove(.*)ponder'
         self.player_type = self.check_player_type()
         self.players_turn = False
+        self.opponent = self.set_opponent()
 
     def check_player_type(self):
         if self.player == '/white':
+            self.opponent = '/black'
             return 0
         else:
+            self.opponent = '/white'
             return 1 # for blacks
+        
+    def set_opponent(self):
+        if self.player == '/white':
+            return '/black'
+        else:
+            return'/white'
 
     def close_game(self):
         print("Exiting...")
@@ -76,14 +85,14 @@ class ChessPlayer():
     def make_move(self, time=1000):
         self.conn.write("go movetime " + str(time))
         read_data = self.conn.read()
-        print(read_data)
+        #print(read_data)
         if len(read_data) == 0:
             print("trying again")
             read_data = self.conn.read() #try again if no data collected
         move_read = re_string_search(self.uci_move_regex,read_data)
         #move_read ='d2d4' #hardcoding first move for dev!
         move_msg = make_move_msg(move_read, self.player_type)
-        print(move_read)
+        #print(move_read)
         return move_msg
     
     def first_turn(self):
@@ -92,36 +101,61 @@ class ChessPlayer():
         else:
             self.players_turn = False
 
-def print_calls(val):
-    print(val)
+    def listener(self):
+        rospy.Subscriber(self.opponent+'/done', Empty, self.opponent_finished_turn)
+
+    def opponent_finished_turn(self, data):
+        #print(type(data))
+        if data == Empty():
+            self.players_turn = True
+        return
 
 def main():
     rospy.init_node("chess_player")
     player = rospy.get_name()
     device = rospy.get_param(player+'/device')
+    print(player, device)
+    chess_player = ChessPlayer(player, device)
+    print(chess_player.opponent)
+    print(chess_player.player_type)
+    rate = rospy.Rate(5)
+    rospy.sleep(1)
 
     move_topic = player+'/move'
     move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
-    done_topic = player+'/done'
-    done_pub = rospy.Publisher(done_topic, Empty, queue_size=3) #publisher to notify end of turn
+    player_done_topic = player+'/done'
+    player_done_pub = rospy.Publisher(player_done_topic, Empty, queue_size=3) #publisher to notify end of turn
+ 
 
-    print(player, device)
-    chess_player = ChessPlayer(player, device)
-    rospy.sleep(1)
     print(chess_player.intialize_game())
     if chess_player.game_init:
-        # if chess_player.player_type:
-        #     #if white
-        while not rospy.is_shutdown():
-            rospy.sleep(5)
+        rospy.sleep(5)
+        counter = 0
+        if chess_player.player_type == 0:
+            print("White has 1st move")
+            ### MAke a move
+            chess_player.players_turn = True
             move_to_pub= chess_player.make_move()
             print(move_to_pub)
-            print(move_to_pub.piece.player.id)
             move_pub.publish(move_to_pub)
-            #done_pub.publish(Empty)
-            rospy.sleep(1)
-            rospy.sleep(15)
-            break
+            player_done_pub.publish(Empty())
+            chess_player.players_turn = False
+            ### 
+        while not rospy.is_shutdown():
+            #print(player, counter)
+            counter = counter + 1
+            if chess_player.players_turn != True:
+                chess_player.listener() #check if it is my turn
+            else:
+                print(player+': Move!')
+                #### Make a move
+                move_to_pub= chess_player.make_move()
+                print(move_to_pub)
+                move_pub.publish(move_to_pub)
+                player_done_pub.publish(Empty())
+                chess_player.players_turn = False
+                ####
+            rate.sleep()
     # rospy.sleep(5)
     # rospy.init_node('chess_player')
     # #r = rospy.Rate(10) # 10hz
