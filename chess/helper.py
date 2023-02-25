@@ -24,25 +24,28 @@ def queue_to_space_delimited_str(queue):
     print("---")
     return spaced_str
 
-def make_move_msg(move_read, player_id):
+def make_move_msg(move_read, player_id, board_state):
     """does not handle castle or promotion!!!"""
     #print(type(move_read))
-    src_row = ord(move_read[0]) - 96
-    src_col = int(move_read[1])
-    dst_row = ord(move_read[2]) - 96 #convert string of letter to its index in alphabet
-    dst_col = int(move_read[3])
+    src_col = ord(move_read[0]) - 96
+    src_row = int(move_read[1])
+    dst_col = ord(move_read[2]) - 96 #convert string of letter to its index in alphabet
+    dst_row = int(move_read[3])
+    src_id = ((src_row-1) *8) + src_col
+    piece_moved = board_state[src_id]["piece"].kind
+    print("PIECE MOVED",piece_moved)
     is_castling = False
     is_promotion = False
     # print(player_id)
-    piece = Chesspiece(player=Player(player_id),kind=Chesspiece.PAWN) #TODO how do I know what piece it is
+    piece = Chesspiece(player=Player(player_id),kind=piece_moved) #TODO how do I know what piece it is
     return Move(src_row, src_col, dst_row, dst_col, is_castling, is_promotion, piece)
 
 def unpack_moves_to_str(move):
     move_str = ''
-    move_str = move_str + chr(move.src_row + 96)
-    move_str = move_str + str(move.src_col)
-    move_str = move_str + chr(move.dst_row + 96)
-    move_str = move_str + str(move.dst_col)
+    move_str = move_str + chr(move.src_col + 96)
+    move_str = move_str + str(move.src_row)
+    move_str = move_str + chr(move.dst_col + 96)
+    move_str = move_str + str(move.dst_row)
     if not move.is_castling:
         return move_str
     else:

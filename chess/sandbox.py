@@ -4,40 +4,40 @@ import sys
 from serial_comms import SerialComms
 from helper import substr_search
 
-port = "/tmp/stockfish"
-with SerialComms(port) as conn:
-    conn.ser.reset_input_buffer()
-    conn.ser.reset_output_buffer()
-    time.sleep(0.1)
-    print(conn.port_name)
+# port = "/tmp/stockfish"
+# with SerialComms(port) as conn:
+#     conn.ser.reset_input_buffer()
+#     conn.ser.reset_output_buffer()
+#     time.sleep(0.1)
+#     print(conn.port_name)
 
-    try:
-        conn.write("uci")
-        flag = True
-    #read_data = self.conn.read()
-    #flag = substr_search("uciok",read_data)
-    except:
-        flag = False
-    print(flag)
+#     try:
+#         conn.write("uci")
+#         flag = True
+#     #read_data = self.conn.read()
+#     #flag = substr_search("uciok",read_data)
+#     except:
+#         flag = False
+#     print(flag)
 
-    try:
-        conn.write("ucinewgame")
-        flag = True
-    #read_data = self.conn.read()
-    #flag = substr_search("uciok",read_data)
-    except:
-        flag = False
-    print(flag)
+#     try:
+#         conn.write("ucinewgame")
+#         flag = True
+#     #read_data = self.conn.read()
+#     #flag = substr_search("uciok",read_data)
+#     except:
+#         flag = False
+#     print(flag)
 
-    try:
-        conn.write("isready")
-        read_data = conn.read()
-        print(read_data)
-        flag = substr_search("readyok",read_data)
-        print("new:" + str(flag))
-    except:
-        flag = False
-    print(flag)
+#     try:
+#         conn.write("isready")
+#         read_data = conn.read()
+#         print(read_data)
+#         flag = substr_search("readyok",read_data)
+#         print("new:" + str(flag))
+#     except:
+#         flag = False
+#     print(flag)
 
 
     # conn.write("uci")

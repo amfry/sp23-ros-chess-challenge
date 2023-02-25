@@ -8,6 +8,10 @@ import rospy
 
 from chess.msg import Chessboard, Chesspiece, Player
 
+from helper_board_state import *
+
+
+
 
 captures = {
     Player.WHITE: [],
@@ -27,7 +31,7 @@ def prettyprint(board):
     ansi_fg = { Player.WHITE: "38;5;240", Player.BLACK: "38;5;232" }
     ansi_bg = [ "48;5;250", "48;5;255" ]  # black, white
 
-    for row in xrange(7, -1, -1):  # draw row 1 last, at the bottom
+    for row in range(7, -1, -1):  # draw row 1 last, at the bottom
         line = ''
         for col in range(8):
             piece = board.squares[8*row+col]
@@ -61,3 +65,21 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # for i in range(0,64):
+    #     new_piece = Chesspiece(Player(Player.WHITE),"p")
+    #     board.append(new_piece)
+    # for i in range(0,33):
+    #     new_piece = Chesspiece(Player(Player.WHITE),"")
+    #     board.append(new_piece)
+    # for i in range(0,7):
+    #     new_piece = Chesspiece(Player(Player.BLACK),"q")
+    #     board.append(new_piece)
+    # print(len(board))
+    # board = Chessboard(board)
+    # #prettyprint(board)
+    # board = create_board_state_dict()
+    # board = init_board_state_dict(board)
+    # print(len(board))
+    # # print(board[58].kind)
+    # board = create_squares_list(board)
+    # prettyprint(board)
