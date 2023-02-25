@@ -139,6 +139,17 @@ class ChessPlayer():
         empty_board_dict = create_board_state_dict()
         board_state = init_board_state_dict(empty_board_dict)
         return board_state
+    
+    def check_move_for_capture(self,move):
+        capture_flag = False
+        src_id, dst_id = move_to_board_state_ids(move)
+        chesspiece_msg = self.board_state[dst_id]["piece"]
+        piece_type = chesspiece_msg.kind
+        print("capture?",piece_type)
+        if piece_type != "":
+            print("CAPTURE!")
+            capture_flag = True
+        return capture_flag, chesspiece_msg
 
 
 
@@ -156,7 +167,9 @@ def main():
     move_topic = player+'/move'
     move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
     chessboard_topic = '/chessboard'
-    chessboard_pub = rospy.Publisher(chessboard_topic, Chessboard, queue_size=1)
+    chessboard_pub = rospy.Publisher(chessboard_topic, Chessboard, queue_size=3)
+    capture_topic = player+'/capture'
+    capture_pub = rospy.Publisher(capture_topic, Chesspiece, queue_size=3) #publisher for moves
     player_done_topic = player+'/done'
     player_done_pub = rospy.Publisher(player_done_topic, Empty, queue_size=3) #publisher to notify end of turn
  
@@ -173,7 +186,8 @@ def main():
             #print(move_to_pub)
             print(move_msg_list_to_space_del_list(chess_player.all_moves))
             move_pub.publish(move_to_pub)
-            chessboard_pub.publish(create_chessboard_msg(chess_player.update_board_state()))
+            updated_board_state = chess_player.update_board_state()
+            chessboard_pub.publish(create_chessboard_msg(updated_board_state))
             player_done_pub.publish(Empty())
             chess_player.players_turn = False
             ### 
@@ -187,10 +201,14 @@ def main():
                 #### Make a move
                 print(move_msg_list_to_space_del_list(chess_player.all_moves))
                 print("---")
-                move_to_pub= chess_player.make_move()
+                move_to_pub=chess_player.make_move()
                 print(move_msg_list_to_space_del_list(chess_player.all_moves))
                 move_pub.publish(move_to_pub)
-                chessboard_pub.publish(create_chessboard_msg(chess_player.update_board_state()))
+                capture_flag, captured_piece = chess_player.check_move_for_capture(move_to_pub)
+                if capture_flag:
+                    capture_pub.publish(captured_piece)
+                updated_board_state = chess_player.update_board_state()
+                chessboard_pub.publish(create_chessboard_msg(updated_board_state))
                 player_done_pub.publish(Empty())
                 chess_player.players_turn = False
                 ####
