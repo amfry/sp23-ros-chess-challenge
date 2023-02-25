@@ -72,11 +72,21 @@ def move_to_board_state_ids(move):
     dst_id = ((d_row-1) *8) + d_column
     return src_id, dst_id
 
+def move_to_updated_board_state(move, board_state):
+    move_piece = move.piece
+    # player = Player(move.piece.player.id)
+    # print(player)
+    empty_space = Chesspiece(Player(Player.BLACK),Chesspiece.EMPTY) #hardcoded cuz location empty
+    src_id, dst_id = move_to_board_state_ids(move)
+    board_state[src_id]["piece"] = empty_space  #src sq is empty
+    board_state[dst_id]["piece"] = move_piece
+    return board_state
+
+
 if __name__ == '__main__':
     board = create_board_state_dict()
     board = init_board_state_dict(board)
     # create_squares_list(board)
-    msg = make_move_msg('d2d4',1)
-    print(msg)
-    print(move_to_board_state_ids(msg))
+    msg = make_move_msg('d2d4',1, board)
+    move_to_updated_board_state(msg, board)
     

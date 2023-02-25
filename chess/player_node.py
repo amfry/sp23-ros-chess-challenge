@@ -96,8 +96,10 @@ class ChessPlayer():
         self.all_moves.append(move_msg) #add your move to list
         return move_msg
     
-    # def update_board_state(move):
-        
+    def update_board_state(self):
+        for move in self.all_moves:
+            self.board_state = move_to_updated_board_state(move,self.board_state)
+        return self.board_state
 
     def first_turn(self):
         if self.player_type == 0:
@@ -153,8 +155,8 @@ def main():
 
     move_topic = player+'/move'
     move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
-    chessboard_topic = player+'/chessboard'
-    chessboard_pub = rospy.Publisher(chessboard_topic, Chessboard, queue_size=3)
+    chessboard_topic = '/chessboard'
+    chessboard_pub = rospy.Publisher(chessboard_topic, Chessboard, queue_size=1)
     player_done_topic = player+'/done'
     player_done_pub = rospy.Publisher(player_done_topic, Empty, queue_size=3) #publisher to notify end of turn
  
@@ -171,6 +173,7 @@ def main():
             #print(move_to_pub)
             print(move_msg_list_to_space_del_list(chess_player.all_moves))
             move_pub.publish(move_to_pub)
+            chessboard_pub.publish(create_chessboard_msg(chess_player.update_board_state()))
             player_done_pub.publish(Empty())
             chess_player.players_turn = False
             ### 
@@ -186,8 +189,8 @@ def main():
                 print("---")
                 move_to_pub= chess_player.make_move()
                 print(move_msg_list_to_space_del_list(chess_player.all_moves))
-                #break
                 move_pub.publish(move_to_pub)
+                chessboard_pub.publish(create_chessboard_msg(chess_player.update_board_state()))
                 player_done_pub.publish(Empty())
                 chess_player.players_turn = False
                 ####
