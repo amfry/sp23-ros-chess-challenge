@@ -2,7 +2,7 @@
 
 import rospy
 from serial_comms import SerialComms
-from helper import substr_search, re_string_search, queue_to_space_delimited_str, make_move_msg
+from helper import substr_search, re_string_search, queue_to_space_delimited_str, make_move_msg, move_msg_list_to_space_del_list
 from queue import Queue
 from chess.msg import Chessboard, Chesspiece, Player, Move
 from std_msgs.msg import Empty
@@ -14,11 +14,12 @@ class ChessPlayer():
         self.device = device
         self.conn = SerialComms(self.device)
         self.game_init = False
-        self.moves_queue = Queue()
+        #self.moves_queue = Queue()
         self.uci_move_regex = r'bestmove(.*)ponder'
         self.player_type = self.check_player_type()
         self.players_turn = False
         self.opponent = self.set_opponent()
+        self.all_moves = [] #order list acting like queue
 
     def check_player_type(self):
         if self.player == '/white':
@@ -78,21 +79,20 @@ class ChessPlayer():
         return flag
     
     def send_moves(self):
-        all_moves = queue_to_space_delimited_str(self.moves_queue)
-        self.conn.write("position startpos moves" + all_moves)
+        all_moves = move_msg_list_to_space_del_list(self.all_moves)
+        #print("info: ", len(all_moves), all_moves)
+        self.conn.write("position startpos moves " + all_moves)
+        rospy.sleep(1)
         return
     
     def make_move(self, time=1000):
+        self.send_moves()
         self.conn.write("go movetime " + str(time))
         read_data = self.conn.read()
-        #print(read_data)
-        if len(read_data) == 0:
-            print("trying again")
-            read_data = self.conn.read() #try again if no data collected
         move_read = re_string_search(self.uci_move_regex,read_data)
-        #move_read ='d2d4' #hardcoding first move for dev!
         move_msg = make_move_msg(move_read, self.player_type)
         #print(move_read)
+        self.all_moves.append(move_msg) #add your move to list
         return move_msg
     
     def first_turn(self):
@@ -101,14 +101,35 @@ class ChessPlayer():
         else:
             self.players_turn = False
 
-    def listener(self):
+    def turn_listener(self):
         rospy.Subscriber(self.opponent+'/done', Empty, self.opponent_finished_turn)
-
+       
     def opponent_finished_turn(self, data):
-        #print(type(data))
+        #print("Marker 1")
         if data == Empty():
             self.players_turn = True
         return
+    
+    def opponent_last_move_listener(self):
+        name = self.opponent+'/move'
+        #print(name)
+        rospy.Subscriber(name, Move, self.opponent_last_move)
+        return
+
+    def opponent_last_move(self, data):
+        if len(self.all_moves) == 0:
+            #print("new data!")
+            #first move recorded by player
+            self.all_moves.append(data) 
+        elif data != self.all_moves[-1]:
+            #print("new data!")
+            #if this is a new move
+            self.all_moves.append(data) 
+        else:
+            #print("stale data")
+            return
+
+
 
 def main():
     rospy.init_node("chess_player")
@@ -136,7 +157,8 @@ def main():
             ### MAke a move
             chess_player.players_turn = True
             move_to_pub= chess_player.make_move()
-            print(move_to_pub)
+            #print(move_to_pub)
+            print(move_msg_list_to_space_del_list(chess_player.all_moves))
             move_pub.publish(move_to_pub)
             player_done_pub.publish(Empty())
             chess_player.players_turn = False
@@ -145,44 +167,22 @@ def main():
             #print(player, counter)
             counter = counter + 1
             if chess_player.players_turn != True:
-                chess_player.listener() #check if it is my turn
+               chess_player.turn_listener() #check if it is my turn
+               chess_player.opponent_last_move_listener() #check for last move
             else:
+                #players turn
                 print(player+': Move!')
                 #### Make a move
+                print(move_msg_list_to_space_del_list(chess_player.all_moves))
+                print("---")
                 move_to_pub= chess_player.make_move()
-                print(move_to_pub)
+                print(move_msg_list_to_space_del_list(chess_player.all_moves))
                 move_pub.publish(move_to_pub)
                 player_done_pub.publish(Empty())
                 chess_player.players_turn = False
                 ####
             rate.sleep()
-    # rospy.sleep(5)
-    # rospy.init_node('chess_player')
-    # #r = rospy.Rate(10) # 10hz
-    # player = rospy.get_name()
-    # device = rospy.get_param(player+'/device')
-    # chess_player = ChessPlayer(player, device) #
-    # rospy.sleep(5)
-    # chess_player.intialize_game()
-    # rospy.sleep(5)
-    # print(player + str(chess_player.game_init))
-    # rospy.sleep(1)
-    # move_topic = player+'/move'
-    # move_pub = rospy.Publisher(move_topic, Move, queue_size=3) #publisher for moves
-    # capture_topic = player+'/capture'
-    # capture_pub = rospy.Publisher(capture_topic, Chesspiece, queue_size=3) #publisher for captures
-    # board_topic = '/chessboard'
-    # board_pub = rospy.Publisher(board_topic, Chessboard, queue_size=1) #publisher for updated board
-    # done_topic = player+'/done'
-    # done_pub = rospy.Publisher(done_topic, Empty, queue_size=3) #publisher to notify end of turn
-    # #chess_player.game_init = True
-    # if chess_player.game_init:
-    #     while not rospy.is_shutdown():
-    #         move_to_pub= chess_player.make_move()
-    #         move_pub.publish(move_to_pub)
-    #         done_pub.publish(Empty)
-    #         rospy.sleep(15)
-    #         break
+   
     chess_player.close_game()
 
 if __name__ == '__main__':

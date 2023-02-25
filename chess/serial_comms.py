@@ -39,8 +39,10 @@ class SerialComms():
         return
 
     def close_port(self):
-        self.ser.flush()
-        self.ser.close()
+        try:
+            self.ser.flush()
+        except:
+            self.ser.close()
         return
 
     def write(self,cmd):
@@ -63,7 +65,7 @@ class SerialComms():
 
             Returns:
                     results (str): """
-        time.sleep(.1)
+        time.sleep(.5)
         chunk_size = 100
         read_buffer = b''
         empty_counter = 0
@@ -71,7 +73,6 @@ class SerialComms():
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
             size = len(byte_chunk)
-            print(size)
             # print(size)
             if not size == chunk_size:
                 break
