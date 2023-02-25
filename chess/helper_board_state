@@ -1,0 +1,65 @@
+from chess.msg import Chessboard, Chesspiece, Player
+
+
+def create_board_state_dict():
+    board_state_dict = {}
+    for i in range(1,65):   
+        board_state_dict[i] = {'row','column','piece'}
+    return board_state_dict
+
+def init_board_state(board_state):
+    white_pawns = Chesspiece(Player(Player.WHITE),"PAWN")
+    white_king = Chesspiece(Player(Player.WHITE),"KING")
+    white_queen = Chesspiece(Player(Player.WHITE),"QUEEN")
+    white_rook = Chesspiece(Player(Player.WHITE),"ROOK")
+    white_knight = Chesspiece(Player(Player.WHITE),"KNIGHT")
+    white_bishop = Chesspiece(Player(Player.WHITE),"BISHOP")
+    ###
+    black_pawns = Chesspiece(Player(Player.BLACK),"PAWN")
+    black_king = Chesspiece(Player(Player.BLACK),"KING")
+    black_queen = Chesspiece(Player(Player.BLACK),"QUEEN")
+    black_rook = Chesspiece(Player(Player.BLACK),"ROOK")
+    black_knight = Chesspiece(Player(Player.BLACK),"KNIGHT")
+    black_bishop = Chesspiece(Player(Player.BLACK),"BISHOP")
+    ###
+    empty_spaces = Chesspiece(Player(Player.WHITE),"EMPTY")
+    #EMPTY
+    for i in range(17,49):
+        board_state[i] = {'row':'2','column': i,'piece': empty_spaces}
+    #WHITE
+    for i in range(9,17):
+        board_state[i] = {'row':'2','column': i,'piece': white_pawns}
+    board_state[1] = {'row':'1','column': 1,'piece': white_rook}
+    board_state[8] = {'row':'1','column': 8,'piece': white_rook }
+    board_state[2] = {'row':'1','column': 2,'piece': white_knight}
+    board_state[7] = {'row':'1','column': 7,'piece': white_knight}
+    board_state[3] = {'row':'1','column': 3,'piece': white_bishop}
+    board_state[6] = {'row':'1','column': 6,'piece': white_bishop}
+    board_state[4] = {'row':'1','column': 4,'piece': white_king}
+    board_state[5] = {'row':'1','column': 5,'piece': white_queen}
+    #BLACK
+    for i in range(49,57):
+        board_state[i] = {'row':'2','column': i,'piece': black_pawns}
+    board_state[57] = {'row':'8','column': 1,'piece': black_rook}
+    board_state[64] = {'row':'8','column': 8,'piece': black_rook }
+    board_state[58] = {'row':'8','column': 2,'piece': black_knight}
+    board_state[63] = {'row':'8','column': 7,'piece': black_knight}
+    board_state[59] = {'row':'8','column': 3,'piece': black_bishop}
+    board_state[62] = {'row':'8','column': 6,'piece': black_bishop}
+    board_state[60] = {'row':'8','column': 4,'piece': black_king}
+    board_state[61] = {'row':'8','column': 5,'piece': black_queen}
+    return board_state
+
+def create_chessboard_msg(board_state):
+    board = []
+    for i in range(1,65):
+        new_piece = board_state[i]['piece']
+        board.append(new_piece)
+    return board
+
+
+
+if __name__ == '__main__':
+    board = create_board_state_dict()
+    board = init_board_state(board)
+    create_chessboard_msg(board)
