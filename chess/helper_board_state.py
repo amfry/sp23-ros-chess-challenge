@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from chess.msg import Chessboard, Chesspiece, Player
 import math
 
@@ -79,7 +81,7 @@ def move_to_board_state_ids(move):
     dst_id = ((d_row-1) *8) + d_column
     return src_id, dst_id
 
-def move_to_updated_board_state(move, board_state):
+def update_board_state_from_move(move, board_state):
     """Use reccent chess move to update the board_state"""
     move_piece = move.piece
     empty_space = Chesspiece(Player(Player.BLACK),Chesspiece.EMPTY) #hardcoded cuz location empty

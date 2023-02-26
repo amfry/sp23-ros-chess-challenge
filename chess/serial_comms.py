@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import time
 import serial
 
 class SerialComms():
-    """ Serial wrapper"""
+    """ General User Serial wrapper"""
 
     def __init__(self,port_name, baudrate=9600, timeout=1, bytesize=8, parity_bit=serial.PARITY_NONE, stopbits=1):
         self.port_name = port_name
@@ -50,13 +51,12 @@ class SerialComms():
             Parameters:
                     cmd(str): message to be sent to serial device
         """
-        # self.ser.flushOutput()
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
         self.ser.write(str.encode(cmd + '\r')) #carriage return
         return
 
-    def read(self, chunk_size=100):
+    def read(self, chunk_size=100, sleep=0.2):
         """Returns string of data read from the output buffer
 
             Parameters:
@@ -64,24 +64,16 @@ class SerialComms():
                     at one time. Larger size means faster reads
 
             Returns:
-                    results (str): """
-        time.sleep(.5)
-        chunk_size = 100
+                    results (str): cleaned data read from output buffer"""
+        time.sleep(sleep)
         read_buffer = b''
-        empty_counter = 0
         while self.ser.isOpen() == True:
             byte_chunk = self.ser.read(chunk_size)
             read_buffer += byte_chunk
             size = len(byte_chunk)
-            # print(size)
             if not size == chunk_size:
                 break
-                # empty_counter +=1
-                # #print(size, empty_counter)
-                # if empty_counter >= 2:
-                #     break
         results = read_buffer.decode().strip()
-        #print(results)
         return results
         
         
