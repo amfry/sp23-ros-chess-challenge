@@ -26,8 +26,7 @@ def init_board_state_dict(board_state):
     ###
     empty_spaces = Chesspiece(Player(Player.WHITE),"")
     #EMPTY
-    for i in range(17,49):
-        board_state[i] = {'row':'2','column': i,'piece': empty_spaces}
+    
     #WHITE
     for i in range(9,17):
         board_state[i] = {'row':'2','column': i,'piece': white_pawns}
@@ -37,8 +36,8 @@ def init_board_state_dict(board_state):
     board_state[7] = {'row':'1','column': 7,'piece': white_knight}
     board_state[3] = {'row':'1','column': 3,'piece': white_bishop}
     board_state[6] = {'row':'1','column': 6,'piece': white_bishop}
-    board_state[4] = {'row':'1','column': 4,'piece': white_king}
-    board_state[5] = {'row':'1','column': 5,'piece': white_queen}
+    board_state[4] = {'row':'1','column': 4,'piece': white_queen}
+    board_state[5] = {'row':'1','column': 5,'piece': white_king}
     #BLACK
     for i in range(49,57):
         board_state[i] = {'row':'2','column': i,'piece': black_pawns}
@@ -48,8 +47,11 @@ def init_board_state_dict(board_state):
     board_state[63] = {'row':'8','column': 7,'piece': black_knight}
     board_state[59] = {'row':'8','column': 3,'piece': black_bishop}
     board_state[62] = {'row':'8','column': 6,'piece': black_bishop}
-    board_state[60] = {'row':'8','column': 4,'piece': black_king}
-    board_state[61] = {'row':'8','column': 5,'piece': black_queen}
+    board_state[60] = {'row':'8','column': 4,'piece': black_queen}
+    board_state[61] = {'row':'8','column': 5,'piece': black_king}
+    #EMPTY
+    for i in range(17,57):
+        board_state[i] = {'row':'2','column': i,'piece': empty_spaces}
     return board_state
 
 def create_chessboard_msg(board_state):

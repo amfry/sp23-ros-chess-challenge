@@ -6,6 +6,8 @@ from helper import substr_search, re_string_search, queue_to_space_delimited_str
 from helper_board_state import *
 from chess.msg import Chessboard, Chesspiece, Player, Move
 from std_msgs.msg import Empty
+import colorama
+from colorama import Fore
 
 
 class ChessPlayer():
@@ -159,8 +161,6 @@ def main():
     device = rospy.get_param(player+'/device')
     print(player, device)
     chess_player = ChessPlayer(player, device)
-    # print(chess_player.opponent)
-    # print(chess_player.player_type)
     rate = rospy.Rate(5)
     rospy.sleep(1)
 
