@@ -2,12 +2,11 @@
 
 import rospy
 from serial_comms import SerialComms
-from helper import substr_search, re_string_search, queue_to_space_delimited_str, make_move_msg, move_msg_list_to_space_del_list
+from helper import substr_search, re_string_search, make_move_msg, move_msg_list_to_space_del_list
 from helper_board_state import *
 from chess.msg import Chessboard, Chesspiece, Player, Move
 from std_msgs.msg import Empty
-import colorama
-from colorama import Fore
+
 
 
 class ChessPlayer():
