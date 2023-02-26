@@ -1,6 +1,4 @@
 # ROS Chess Engine
-
-
 ## Development Platform
 I conducted this program's development on a machine running Ubuntu 20.04 and ROS Noetic  [Pyserial](https://pyserial.readthedocs.io/en/latest/pyserial.html) was used to create the serial driver.
 
@@ -15,22 +13,19 @@ The `ChessPlayer` class acts as a player in the chess game. It intiates the ches
 </p>
 
 ## Design Decisions
-A major design decision I made was to store the state of the game in the nested dictionary. I selected the nested dictionary after interacting with the `chess/Chessboard` and `chess/Move` custom messages. To geneate the terminal rendering of the chessboard,'chess/Chessboard' contains 64 indivdual 'chess/Chesspiece'messages that are visualized `a1` through `h8` on the board. The outer dictionary of `board_state` contains an index that related to each spquare on the board starting `a1` through `h8`. At each of those index, I was able to store the relevant compnents to reprsent the state of the board. That included: 
+A major design decision I made was to store the state of the game in the nested dictionary. I selected the nested dictionary after interacting with the `chess/Chessboard` and `chess/Move` custom messages. To geneate the terminal rendering of the chessboard,'chess/Chessboard' contains 64 indivdual `chess/Chesspiece` messages that are visualized `a1` through `h8` on the board. The outer dictionary of `board_state` contains an index that related to each spquare on the board starting `a1` through `h8`. At each of those index, I was able to store the relevant compnents to reprsent the state of the board. That included: 
   - row
   - colum
   - `chess/Chesspiece`
   
   When a new move was made, I was able to easily to find the index for the square impacted by the row and column conatined in `chess/Move` messages and could then update the piece at that position as needed. This also provided an easy way to check for capture and look at the conditions for castling.
 
-## Castling
-- Kingside
-- Queenside
-## Promotion
-- Any UCI message of length 5 is a promotion
-
 # Resources
+I referenced the following materials to refresh on ROS debugging tool and learn more about using custom message.
 - [Programming Robots with ROS](https://www.oreilly.com/library/view/programming-robots-with/9781449325480/)
-- [A Gentle Introduction to ROS](https://jokane.net/agitr/)
+- [A Gentle Introduction to ROS](https://jokane.net/agitr/) 
+
+I referenced this resource to get more familiar with the rules of the chess and castling.
 - [How to Castle in Chess](https://www.chess.com/article/view/how-to-castle-in-chess)
 
 # Future Improvments
