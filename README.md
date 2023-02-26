@@ -6,6 +6,13 @@ Original Challenge: [here](https://github.com/WHOIGit/ros-chess-challenge)
 I conducted this program's development on a machine running Ubuntu 20.04 and ROS Noetic.
 
 # Architecture
+<p align="center">
+  <img width="580" height="420" src="https://github.com/amfry/sp23-ros-chess-challenge/blob/develop/docs/chess_opening_seq.png">
+</p>
+<p Example opening seqeuence played by the competeing player nodes">
+  <em>image_caption</em>
+</p>
+
 - General purpose serial library
 - Player node
 
