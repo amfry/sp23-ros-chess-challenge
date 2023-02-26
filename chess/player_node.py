@@ -159,8 +159,8 @@ def main():
     device = rospy.get_param(player+'/device')
     print(player, device)
     chess_player = ChessPlayer(player, device)
-    print(chess_player.opponent)
-    print(chess_player.player_type)
+    # print(chess_player.opponent)
+    # print(chess_player.player_type)
     rate = rospy.Rate(5)
     rospy.sleep(1)
 
@@ -199,7 +199,7 @@ def main():
                 #players turn
                 print(player+': Move!')
                 #### Make a move
-                print(move_msg_list_to_space_del_list(chess_player.all_moves))
+                #print(move_msg_list_to_space_del_list(chess_player.all_moves))
                 print("---")
                 move_to_pub=chess_player.make_move()
                 print(move_msg_list_to_space_del_list(chess_player.all_moves))

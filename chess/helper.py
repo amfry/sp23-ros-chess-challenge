@@ -3,6 +3,7 @@
 import re
 from queue import Queue
 from chess.msg import Move, Chesspiece, Player
+from helper_board_state import *
 
 def substr_search(substring, search_str):
     if substring in search_str:
@@ -27,15 +28,21 @@ def queue_to_space_delimited_str(queue):
 def make_move_msg(move_read, player_id, board_state):
     """does not handle castle or promotion!!!"""
     #print(type(move_read))
+    is_castling = False
+    is_promotion = False
     src_col = ord(move_read[0]) - 96
     src_row = int(move_read[1])
     dst_col = ord(move_read[2]) - 96 #convert string of letter to its index in alphabet
     dst_row = int(move_read[3])
     src_id = ((src_row-1) *8) + src_col
     piece_moved = board_state[src_id]["piece"].kind
-    print("PIECE MOVED",piece_moved)
+    if len(move_read) > 4:
+        piece_moved = move_read[4]
+        print("PROMOTED!!!!!!!!!!!")
+        is_promotion = True
     is_castling = False
-    is_promotion = False
+    
+    
     # print(player_id)
     piece = Chesspiece(player=Player(player_id),kind=piece_moved) #TODO how do I know what piece it is
     return Move(src_row, src_col, dst_row, dst_col, is_castling, is_promotion, piece)
@@ -67,11 +74,12 @@ def move_msg_list_to_space_del_list(move_list):
 
 
 if __name__ == '__main__':
-    msg1 = make_move_msg('d2d4',1)
-    msg2 = make_move_msg('e7e6',0)
-    msg3 = make_move_msg('c2c4',1)
-    vals  = [msg1,msg2,msg3]
-    print(move_msg_list_to_space_del_list(vals))
+    board = create_board_state_dict()
+    board = init_board_state_dict(board)
+    msg1 = make_move_msg('d2d4q',1,board)
+    # msg2 = make_move_msg('e7e6',0)
+    # msg3 = make_move_msg('c2c4',1)
+    msg1
    
 
     
