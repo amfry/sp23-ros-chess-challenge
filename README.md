@@ -1,6 +1,6 @@
 # ROS Chess Engine
 ## Development Platform
-I conducted this program's development on a machine running Ubuntu 20.04 and ROS Noetic  [Pyserial](https://pyserial.readthedocs.io/en/latest/pyserial.html) was used to create the serial driver.
+I conducted this program's development on a machine running Ubuntu 20.04, Python3 and ROS Noetic.  [Pyserial](https://pyserial.readthedocs.io/en/latest/pyserial.html) was used to create the serial driver.
 
 # Architecture
 The `ChessPlayer` class acts as a player in the chess game. It initiates the chess engine, keeps track of the chessboard state, takes turns with its opponent, and communicates with the chess engine to make moeves. `ChessPlayer` is built on top of `SerialComms`, a simple serial driver class used to communicate with [Stockfish.](https://stockfishchess.org/). The original parameters for the chess challenge can be found [here](https://github.com/WHOIGit/ros-chess-challenge).
