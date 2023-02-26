@@ -1,10 +1,11 @@
-#ROS Chess Engine
+# ROS Chess Engine
 
 Original Challenge: [here](https://github.com/WHOIGit/ros-chess-challenge)
-#Development Platform
+
+# Development Platform
 I conducted this program's development on a machine running Ubuntu 20.04 and ROS Noetic.
 
-#Architecture
+# Architecture
 - General purpose serial library
 - Player node
 
